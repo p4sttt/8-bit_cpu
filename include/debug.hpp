@@ -20,7 +20,6 @@ class DebugConsole {
     static constexpr const char* kPrintMemory = "memo";
     static constexpr const char* kQuit = "quit";
     static constexpr const char* kPrintCurrentInstruction = "instr";
-    
 
   public:
     DebugConsole();

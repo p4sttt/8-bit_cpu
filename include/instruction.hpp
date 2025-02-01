@@ -67,17 +67,14 @@ class ArithmeticalLogicalInstruction : public Instruction {
     opcode_t reg_idx_2_;
 
   public:
-    ArithmeticalLogicalInstruction(mode_t mode,
-                                   opcode_t reg_idx_1,
-                                   opcode_t reg_idx_2);
+    ArithmeticalLogicalInstruction(mode_t mode, opcode_t reg_idx_1, opcode_t reg_idx_2);
 
     void Execute(CPUState& state) override;
 };
 
 class InstructionFactory {
   private:
-    using InstructionCreator_ =
-        std::function<std::unique_ptr<Instruction>(opcode_t)>;
+    using InstructionCreator_ = std::function<std::unique_ptr<Instruction>(opcode_t)>;
     std::unordered_map<opcode_t, InstructionCreator_> instructions_;
 
   public:

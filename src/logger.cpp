@@ -9,8 +9,7 @@
 
 void Logger::Log(const std::string& msg, log_level_t log_level) {
     auto& options = CMDOptions::GetInstance();
-    if (!options.GetIsLog())
-        return;
+    if (!options.GetIsLog()) return;
 
     switch (log_level) {
     case INFO:

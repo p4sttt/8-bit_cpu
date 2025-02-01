@@ -10,9 +10,7 @@
 
 InstructionFactory g_instruction_factory;
 
-MoveInstruction::MoveInstruction(endianness_t mode,
-                                 opcode_t reg_idx,
-                                 opcode_t value)
+MoveInstruction::MoveInstruction(endianness_t mode, opcode_t reg_idx, opcode_t value)
     : mode_(mode)
     , reg_idx_(reg_idx)
     , value_(value) {}
@@ -24,8 +22,7 @@ void MoveInstruction::Execute(CPUState& state) {
         state.SetRegister(reg_idx_, EXTRACT_BITS(prev, 0, 4) | value_);
         break;
     case HIGH:
-        state.SetRegister(
-            reg_idx_, EXTRACT_BITS(prev, 4, 4) | ((value_ << 4) & 0b11110000));
+        state.SetRegister(reg_idx_, EXTRACT_BITS(prev, 4, 4) | ((value_ << 4) & 0b11110000));
         break;
     }
 }
@@ -48,8 +45,9 @@ void StoreInstruction::Execute(CPUState& state) {
     state.SetMemory(addr, val);
 }
 
-ArithmeticalLogicalInstruction::ArithmeticalLogicalInstruction(
-    mode_t mode, opcode_t reg_idx_1, opcode_t reg_idx_2)
+ArithmeticalLogicalInstruction::ArithmeticalLogicalInstruction(mode_t mode,
+                                                               opcode_t reg_idx_1,
+                                                               opcode_t reg_idx_2)
     : mode_(mode)
     , reg_idx_1_(reg_idx_1)
     , reg_idx_2_(reg_idx_2) {}
@@ -123,13 +121,11 @@ InstructionFactory::InstructionFactory() {
         mode_t mode = static_cast<mode_t>(EXTRACT_BITS(opcode, 2, 2));
         opcode_t reg_idx_1 = EXTRACT_BITS(opcode, 4, 2);
         opcode_t reg_idx_2 = EXTRACT_BITS(opcode, 6, 2);
-        return std::make_unique<ArithmeticalLogicalInstruction>(
-            mode, reg_idx_1, reg_idx_2);
+        return std::make_unique<ArithmeticalLogicalInstruction>(mode, reg_idx_1, reg_idx_2);
     });
 }
 
-void InstructionFactory::RegisterInstruction(opcode_t prefix,
-                                             InstructionCreator_ creator) {
+void InstructionFactory::RegisterInstruction(opcode_t prefix, InstructionCreator_ creator) {
     instructions_[prefix] = creator;
 }
 

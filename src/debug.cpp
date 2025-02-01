@@ -7,6 +7,9 @@
 #include "cpu.hpp"
 #include "instruction.hpp"
 
+
+// ЭТОТ КОД ПИСАЛСЯ В СОСТОЯНИИ ИЗМЕНОЕННОГО СОЗНАНИЯ
+// МОГУТ ПОДТЕКАТЬ КРАСНЫЕ СЛЕЗЫ (возможно кровавые :))
 DebugConsole::DebugConsole() {
     RegisterCommand(kHelpMessage, [this](CPUState& state, const std::string& input) {
         std::cout << "Commands:" << std::endl;
