@@ -19,7 +19,7 @@ CPUState::CPUState()
 
 opcode_t CPUState::GetMemory(opcode_t addr) const { return memory_[addr]; }
 opcode_t CPUState::GetRegister(opcode_t idx) const {
-    if (idx <= REGISTERS_COUNT) return regs_[idx];
+    if (idx <= kRegisterCount) return regs_[idx];
     return 0;
 }
 opcode_t CPUState::GetProgramCounter() const { return pc_; }
@@ -27,7 +27,7 @@ bool CPUState::GetSignFlag() const { return sf_; }
 bool CPUState::GetZeroFlag() const { return zf_; }
 void CPUState::LoadProgram(const std::string& filename) {
     std::ifstream file(filename, std::ios::binary);
-    file.read(reinterpret_cast<char*>(memory_.data()), MEMORY_SIZE);
+    file.read(reinterpret_cast<char*>(memory_.data()), kMemorySize);
     file.close();
 }
 
@@ -42,7 +42,7 @@ CPU::CPU(CPUState& state)
     : state_(state) {}
 
 void CPU::RunProgram() {
-    while (state_.GetProgramCounter() < MEMORY_SIZE) {
+    while (state_.GetProgramCounter() < kMemorySize) {
         opcode_t opcode = state_.GetMemory(state_.GetProgramCounter());
         auto instr = g_instruction_factory.Create(opcode);
         instr->Execute(state_);

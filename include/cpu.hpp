@@ -5,16 +5,18 @@
 #include <cstdint>
 #include <string>
 
-#define INSTRUCTION_SIZE 8
-#define REGISTERS_COUNT 4
-#define MEMORY_SIZE 10
+#define EXTRACT_BITS(opcode, n, m) (((opcode) >> (n)) & ((1 << (m)) - 1))
 
-typedef uint8_t opcode_t;
+static constexpr int kBitness = 8;
+static constexpr int kRegisterCount = 4;
+static constexpr int kMemorySize = 10;
+
+using opcode_t = uint8_t;
 
 class CPUState {
   private:
-    std::array<opcode_t, MEMORY_SIZE> memory_;
-    std::array<opcode_t, REGISTERS_COUNT> regs_;
+    std::array<opcode_t, kMemorySize> memory_;
+    std::array<opcode_t, kRegisterCount> regs_;
     opcode_t pc_;
     bool sf_, zf_;
 

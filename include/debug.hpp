@@ -30,7 +30,7 @@ class DebugConsole {
 
 class DebugWrapper : public Instruction {
   private:
-    std::unique_ptr<Instruction> wrappedInstruction_;
+    std::unique_ptr<Instruction> wrapped_instruction_;
 
   public:
     DebugWrapper(std::unique_ptr<Instruction> instr);

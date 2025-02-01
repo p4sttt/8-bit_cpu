@@ -7,7 +7,6 @@
 #include "cpu.hpp"
 #include "instruction.hpp"
 
-
 // ЭТОТ КОД ПИСАЛСЯ В СОСТОЯНИИ ИЗМЕНОЕННОГО СОЗНАНИЯ
 // МОГУТ ПОДТЕКАТЬ КРАСНЫЕ СЛЕЗЫ (возможно кровавые :))
 DebugConsole::DebugConsole() {
@@ -28,35 +27,35 @@ DebugConsole::DebugConsole() {
     RegisterCommand(kPrintRegisters, [this](CPUState& state, const std::string& input) {
         if (input.size() > 5) {
             opcode_t reg_idx = std::atoi(input.substr(5).c_str());
-            std::cout << "R" << std::to_string(reg_idx) << ": "
-                      << std::to_string(state.GetRegister(reg_idx)) << std::endl;
+            std::cout << "R" << std::to_string(reg_idx) << "="
+                      << std::to_string(state.GetRegister(reg_idx)) << "; ";
             return;
         }
 
-        for (opcode_t i = 0; i < REGISTERS_COUNT; ++i) {
-            std::cout << "R" << std::to_string(i) << ": " << std::to_string(state.GetRegister(i))
-                      << std::endl;
+        for (opcode_t i = 0; i < kRegisterCount; ++i) {
+            std::cout << "R" << std::to_string(i + 1) << "=" << std::to_string(state.GetRegister(i))
+                      << "; ";
         }
+        std::cout << std::endl;
     });
 
     RegisterCommand(kPrintMemory, [this](CPUState& state, const std::string& input) {
         if (input.size() > 5) {
             opcode_t addr = std::atoi(input.substr(5).c_str());
             std::cout << std::to_string(addr) << ": "
-                      << std::bitset<INSTRUCTION_SIZE>(state.GetMemory(addr)) << std::endl;
+                      << std::bitset<kBitness>(state.GetMemory(addr)) << std::endl;
             return;
         }
 
-        for (opcode_t i = 0; i < MEMORY_SIZE; ++i) {
-            std::cout << std::to_string(i) << ": "
-                      << std::bitset<INSTRUCTION_SIZE>(state.GetMemory(i)) << std::endl;
+        for (opcode_t i = 0; i < kMemorySize; ++i) {
+            std::cout << std::to_string(i) << ": " << std::bitset<kBitness>(state.GetMemory(i))
+                      << std::endl;
         }
     });
 
     RegisterCommand(kPrintCurrentInstruction, [this](CPUState& state, const std::string& input) {
         std::cout << std::to_string(state.GetProgramCounter()) << ": "
-                  << std::bitset<INSTRUCTION_SIZE>(state.GetMemory(state.GetProgramCounter()))
-                  << std::endl;
+                  << std::bitset<kBitness>(state.GetMemory(state.GetProgramCounter())) << std::endl;
     });
 
     RegisterCommand(kQuit, [this](CPUState& state, const std::string& input) {
@@ -75,6 +74,11 @@ void DebugConsole::ProcessInput(CPUState& state) {
         std::cout << "#> ";
         getline(std::cin, input);
 
+        if (std::cin.eof()) {
+            std::cout << "\nquit..." << std::endl;
+            exit(EXIT_SUCCESS);
+        }
+
         if (commands_.find(input) != commands_.end()) {
             commands_[input](state, input);
         }
@@ -82,12 +86,12 @@ void DebugConsole::ProcessInput(CPUState& state) {
 }
 
 DebugWrapper::DebugWrapper(std::unique_ptr<Instruction> instr)
-    : wrappedInstruction_(std::move(instr)) {}
+    : wrapped_instruction_(std::move(instr)) {}
 
 void DebugWrapper::Execute(CPUState& state) {
     // TODO: не нравится, что при каждом исполнение нужно создавать объект
     // консоли
     DebugConsole console;
     console.ProcessInput(state);
-    wrappedInstruction_->Execute(state);
+    wrapped_instruction_->Execute(state);
 }

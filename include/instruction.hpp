@@ -6,8 +6,6 @@
 
 #include "cpu.hpp"
 
-#define EXTRACT_BITS(opcode, n, m) (((opcode) >> (n)) & ((1 << (m)) - 1))
-
 class Instruction {
   public:
     virtual void Execute(CPUState& state) = 0;

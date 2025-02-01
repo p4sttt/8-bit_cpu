@@ -33,6 +33,6 @@ void Logger::LogHex(opcode_t val) {
 }
 
 void Logger::LogBin(opcode_t val) {
-    std::bitset<INSTRUCTION_SIZE> bits(val);
+    std::bitset<kBitness> bits(val);
     LogInfo("0b" + bits.to_string());
 }

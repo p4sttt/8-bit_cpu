@@ -4,10 +4,10 @@
 
 class Logger {
   private:
-    typedef enum {
+    using log_level_t = enum {
         INFO,
         ERROR,
-    } log_level_t;
+    };
 
   public:
     static void Log(const std::string& msg, log_level_t log_level);
