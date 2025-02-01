@@ -1,0 +1,49 @@
+---
+Language:        Cpp
+BasedOnStyle:    LLVM
+
+ColumnLimit:     100
+
+BreakBeforeBraces: Attach          
+BinPackArguments: false            
+BinPackParameters: false           
+
+AlignAfterOpenBracket: Align       
+
+IncludeBlocks: Preserve            
+IncludeIsMainRegex: '.*'           
+SortIncludes: true                 
+IncludeCategories:                 
+  - Regex: '^<.*>'                 
+    Priority: 1
+  - Regex: '^".*"'                 
+    Priority: 2
+  - Regex: '.*'
+    Priority: 3
+
+PenaltyBreakBeforeFirstCallParameter: 20 
+PenaltyReturnTypeOnItsOwnLine: 200  
+SpacesInAngles: false                    
+
+BreakConstructorInitializers: BeforeComma 
+ConstructorInitializerIndentWidth: 4     
+ContinuationIndentWidth: 4               
+
+IndentWidth: 4                     
+TabWidth: 4                        
+UseTab: Never                      
+SpaceBeforeParens: ControlStatements 
+SpaceBeforeRangeBasedForLoopColon: true 
+
+CommentPragmas: '^ IWYU pragma:' 
+
+Cpp11BracedListStyle: true       
+DerivePointerAlignment: false    
+PointerAlignment: Left           
+
+ReflowComments: true             
+MaxEmptyLinesToKeep: 1           
+AlwaysBreakTemplateDeclarations: true 
+
+AllowShortIfStatementsOnASingleLine: WithoutElse
+AllowShortLoopsOnASingleLine: true

@@ -1,0 +1,38 @@
+/**
+ * Move Instruction
+ * MOV(.H | .L) %reg $val
+ * MOV.H - Fills first 4 bits of the %reg register with value of $val
+ * MOV.L - Fills last 4 bits of the %reg register with value of $val
+ * Example:
+ *      00 11 0110 - MOV.H %R4 $6
+ */
+
+
+
+ /**
+ * Load Instruction
+ * LDR [reg] - Load value at memory [reg] to register R1
+ * Example:
+ *      010000 01 - LDR [R2]
+ */
+
+
+ /**
+ * Store Instruction
+ * STR %reg - Store value at register %reg to memory at R1
+ * Example:
+ *      100000 11 - STR %R4
+ */
+
+
+ /**
+ * Arithmetic and Logical Instruction
+ * (ADD | SUB | AND | OR) %reg1 %reg2
+ * ADD %reg1 %reg2 - Add value at register %reg1 to value at register %reg2 and
+ * save result at register %reg2 SUB %reg1 %reg2 - Substract value at register
+ * %reg1 to value at register %reg2 and save result at register %reg2 AND %reg1
+ * %reg2 - Logical And between values at registers %reg1 and %reg2 and save
+ * result at register %reg2 OR %reg1 %reg2 - Logical Or between values at
+ * registers at %reg1 and %reg2 and save result at register %reg2 Example: 11 00
+ * 00 01 - ADD %R1 %R2
+ */
