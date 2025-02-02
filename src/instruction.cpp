@@ -45,6 +45,41 @@ void StoreInstruction::Execute(CPUState& state) {
     state.SetMemory(addr, val);
 }
 
+BranchInstruction::BranchInstruction(cond_t cond, opcode_t reg_idx)
+    : cond_(cond)
+    , reg_idx_(reg_idx) {}
+
+void BranchInstruction::Execute(CPUState& state) {
+    bool cond = false;
+    opcode_t addr = state.GetRegister(reg_idx_);
+
+    utils::LogInfo("[BranchInstruction::Execute]");
+
+    switch (cond_) {
+    case NONE:
+        utils::LogInfo("B");
+        cond = true;
+    case EQ:
+        utils::LogInfo("BEQ");
+        cond = state.GetZeroFlag();
+        break;
+    case NE:
+        utils::LogInfo("BNE");
+        cond = !state.GetZeroFlag();
+        break;
+    case GE:
+        utils::LogInfo("BGE");
+        cond = !state.GetSignFlag();
+        break;
+    }
+
+    utils::LogInfo("[R" + utils::ToDec(reg_idx_) + "]\n");
+
+    if (cond) {
+        state.SetProgramCounter(addr);
+    }
+}
+
 ArithmeticalLogicalInstruction::ArithmeticalLogicalInstruction(mode_t mode,
                                                                opcode_t reg_idx_1,
                                                                opcode_t reg_idx_2)
@@ -112,6 +147,15 @@ InstructionFactory::InstructionFactory() {
         opcode_t reg_idx = EXTRACT_BITS(opcode, 6, 2);
 
         return std::make_unique<StoreInstruction>(reg_idx);
+    });
+
+    // BRANCH
+    RegisterInstruction(0b1010, [](opcode_t opcode) {
+        using mode_t = BranchInstruction::cond_t;
+        mode_t mode = static_cast<mode_t>(utils::ExtractBits(opcode, 4, 2));
+        opcode_t reg_idx = utils::ExtractBits(opcode, 6, 2);
+
+        return std::make_unique<BranchInstruction>(mode, reg_idx);
     });
 
     // ALU

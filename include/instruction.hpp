@@ -50,6 +50,25 @@ class StoreInstruction : public Instruction {
     void Execute(CPUState& state) override;
 };
 
+class BranchInstruction : public Instruction {
+  public:
+    using cond_t = enum {
+        NONE = 0,
+        EQ = 1,
+        NE = 2,
+        GE = 3,
+    };
+
+  private:
+    cond_t cond_;
+    opcode_t reg_idx_;
+
+  public:
+    BranchInstruction(cond_t cond, opcode_t reg_idx);
+
+    void Execute(CPUState& state) override;
+};
+
 class ArithmeticalLogicalInstruction : public Instruction {
   public:
     using alu_t = enum {
