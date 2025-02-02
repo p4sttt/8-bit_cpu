@@ -6,7 +6,7 @@ src = [
     'src/cpu.cpp',
     'src/debug.cpp',
     'src/instruction.cpp',
-    'src/logger.cpp',
+    'src/utils.cpp',
     'src/options.cpp',
 ]
 incdir = include_directories('include')

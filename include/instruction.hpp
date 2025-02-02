@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "cpu.hpp"
+#include "utils.hpp"
 
 class Instruction {
   public:

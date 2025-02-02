@@ -17,14 +17,20 @@ MoveInstruction::MoveInstruction(endianness_t mode, opcode_t reg_idx, opcode_t v
 
 void MoveInstruction::Execute(CPUState& state) {
     opcode_t prev = state.GetRegister(reg_idx_);
+
     switch (mode_) {
     case LOW:
-        state.SetRegister(reg_idx_, EXTRACT_BITS(prev, 0, 4) | value_);
+        utils::LogInfo("MOV.L");
+        state.SetRegister(reg_idx_, utils::ExtractBits(prev, 0, 4) | value_);
         break;
     case HIGH:
-        state.SetRegister(reg_idx_, EXTRACT_BITS(prev, 4, 4) | ((value_ << 4) & 0b11110000));
+        utils::LogInfo("MOV.H");
+        state.SetRegister(reg_idx_, utils::ExtractBits(prev, 4, 4) | ((value_ << 4) & 0b11110000));
         break;
     }
+
+    utils::LogInfo(" %R" + utils::ToDec(reg_idx_));
+    utils::LogInfo(" $" + utils::ToBin(value_) + '\n');
 }
 
 LoadInstruction::LoadInstruction(opcode_t reg_idx)
@@ -33,6 +39,10 @@ LoadInstruction::LoadInstruction(opcode_t reg_idx)
 void LoadInstruction::Execute(CPUState& state) {
     opcode_t addr = state.GetRegister(reg_idx_);
     opcode_t val = state.GetMemory(addr);
+
+    utils::LogInfo("LDR");
+    utils::LogInfo(" [R" + utils::ToDec(reg_idx_) + "] %R0\b");
+
     state.SetRegister(val, 0);
 }
 
@@ -42,6 +52,10 @@ StoreInstruction::StoreInstruction(opcode_t reg_idx)
 void StoreInstruction::Execute(CPUState& state) {
     opcode_t addr = state.GetRegister(0);
     opcode_t val = state.GetRegister(reg_idx_);
+
+    utils::LogInfo("STR");
+    utils::LogInfo("%R" + utils::ToDec(reg_idx_) + " [R0]");
+
     state.SetMemory(addr, val);
 }
 
@@ -94,21 +108,28 @@ void ArithmeticalLogicalInstruction::Execute(CPUState& state) {
 
     switch (mode_) {
     case ADD:
+        utils::LogInfo("ADD");
         result = operand_1 + operand_2;
         break;
     case SUB:
+        utils::LogInfo("SUB");
         result = operand_1 - operand_2;
         break;
     case AND:
+        utils::LogInfo("AND");
         result = operand_1 & operand_2;
         break;
     case OR:
+        utils::LogInfo("OR");
         result = operand_1 | operand_2;
         break;
     }
 
+    utils::LogInfo(" %R" + utils::ToDec(reg_idx_1_));
+    utils::LogInfo(" %R" + utils::ToDec(reg_idx_2_) + '\n');
+
     state.SetZeroFlag(result == 0);
-    state.SetSignFlag(result < 0);
+    state.SetSignFlag(utils::ExtractBits(result, 0, 1) == 1);
 
     state.SetRegister(reg_idx_2_, result);
 }
@@ -118,9 +139,9 @@ InstructionFactory::InstructionFactory() {
     // MOV.L
     RegisterInstruction(0b00, [](opcode_t opcode) {
         using mode_t = MoveInstruction::endianness_t;
-        mode_t mode = static_cast<mode_t>(EXTRACT_BITS(opcode, 0, 2));
-        opcode_t reg_idx = EXTRACT_BITS(opcode, 2, 2);
-        opcode_t value = EXTRACT_BITS(opcode, 4, 4);
+        mode_t mode = static_cast<mode_t>(utils::ExtractBits(opcode, 0, 2));
+        opcode_t reg_idx = utils::ExtractBits(opcode, 2, 2);
+        opcode_t value = utils::ExtractBits(opcode, 4, 4);
 
         return std::make_unique<MoveInstruction>(mode, reg_idx, value);
     });
@@ -128,23 +149,23 @@ InstructionFactory::InstructionFactory() {
     // MOV.H
     RegisterInstruction(0b01, [](opcode_t opcode) {
         using mode_t = MoveInstruction::endianness_t;
-        mode_t mode = static_cast<mode_t>(EXTRACT_BITS(opcode, 0, 2));
-        opcode_t reg_idx = EXTRACT_BITS(opcode, 2, 2);
-        opcode_t value = EXTRACT_BITS(opcode, 4, 4);
+        mode_t mode = static_cast<mode_t>(utils::ExtractBits(opcode, 0, 2));
+        opcode_t reg_idx = utils::ExtractBits(opcode, 2, 2);
+        opcode_t value = utils::ExtractBits(opcode, 4, 4);
 
         return std::make_unique<MoveInstruction>(mode, reg_idx, value);
     });
 
     // LOAD
-    RegisterInstruction(0b1010, [](opcode_t opcode) {
-        opcode_t reg_idx = EXTRACT_BITS(opcode, 6, 2);
+    RegisterInstruction(0b1000, [](opcode_t opcode) {
+        opcode_t reg_idx = utils::ExtractBits(opcode, 6, 2);
 
         return std::make_unique<LoadInstruction>(reg_idx);
     });
 
-    // STR
-    RegisterInstruction(0b1000, [](opcode_t opcode) {
-        opcode_t reg_idx = EXTRACT_BITS(opcode, 6, 2);
+    // STORE
+    RegisterInstruction(0b1001, [](opcode_t opcode) {
+        opcode_t reg_idx = utils::ExtractBits(opcode, 6, 2);
 
         return std::make_unique<StoreInstruction>(reg_idx);
     });
@@ -162,9 +183,9 @@ InstructionFactory::InstructionFactory() {
     RegisterInstruction(0b11, [](opcode_t opcode) {
         using mode_t = ArithmeticalLogicalInstruction::alu_t;
 
-        mode_t mode = static_cast<mode_t>(EXTRACT_BITS(opcode, 2, 2));
-        opcode_t reg_idx_1 = EXTRACT_BITS(opcode, 4, 2);
-        opcode_t reg_idx_2 = EXTRACT_BITS(opcode, 6, 2);
+        mode_t mode = static_cast<mode_t>(utils::ExtractBits(opcode, 2, 2));
+        opcode_t reg_idx_1 = utils::ExtractBits(opcode, 4, 2);
+        opcode_t reg_idx_2 = utils::ExtractBits(opcode, 6, 2);
         return std::make_unique<ArithmeticalLogicalInstruction>(mode, reg_idx_1, reg_idx_2);
     });
 }
@@ -174,25 +195,18 @@ void InstructionFactory::RegisterInstruction(opcode_t prefix, InstructionCreator
 }
 
 std::unique_ptr<Instruction> InstructionFactory::Create(opcode_t opcode) {
+    auto create_instruction = [&](opcode_t prefix) -> std::unique_ptr<Instruction> {
+        auto it = instructions_.find(prefix);
+        if (it == instructions_.end()) return nullptr;
 
-    opcode_t prefix = EXTRACT_BITS(opcode, 0, 2);
-    auto it = instructions_.find(prefix);
-    if (it != instructions_.end()) {
+        auto instance = it->second(opcode);
         if (CMDOptions::GetInstance().GetIsDebug())
-            return std::make_unique<DebugWrapper>(it->second(opcode));
-        else
-            return it->second(opcode);
-    }
+            return std::make_unique<DebugWrapper>(std::move(instance));
 
-    // костыль для инструкций с префиксом 10
-    prefix = EXTRACT_BITS(opcode, 0, 4);
-    it = instructions_.find(prefix);
-    if (it != instructions_.end()) {
-        if (CMDOptions::GetInstance().GetIsDebug())
-            return std::make_unique<DebugWrapper>(it->second(opcode));
-        else
-            return it->second(opcode);
-    }
+        return instance;
+    };
 
-    return nullptr;
+    if (auto result = create_instruction(utils::ExtractBits(opcode, 0, 2))) return result;
+
+    return create_instruction(utils::ExtractBits(opcode, 0, 4));
 }

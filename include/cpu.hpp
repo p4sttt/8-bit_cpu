@@ -2,16 +2,9 @@
 
 #include <array>
 #include <cstdbool>
-#include <cstdint>
 #include <string>
 
-#define EXTRACT_BITS(opcode, n, m) (((opcode) >> (n)) & ((1 << (m)) - 1))
-
-static constexpr int kBitness = 8;
-static constexpr int kRegisterCount = 4;
-static constexpr int kMemorySize = 10;
-
-using opcode_t = uint8_t;
+#include "utils.hpp"
 
 class CPUState {
   private:
